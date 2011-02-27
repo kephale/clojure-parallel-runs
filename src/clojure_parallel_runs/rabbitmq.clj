@@ -12,6 +12,11 @@
               (connect)
               (create-channel))))
 
+(defn is-connection-open?
+  "Is the connection open?"
+  []
+  (channel-open? chan))
+
 (defn declare-and-bind-queues
   "Initialize queues with the given list of names."
   [& queue-names]

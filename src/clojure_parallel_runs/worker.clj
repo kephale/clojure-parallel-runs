@@ -28,7 +28,9 @@
   [connection-creds q-out q-in output-dir]
   (init-connection connection-creds)
   (loop [msg (mq/get-one q-out)]
-    (if (not (nil? msg))
-      (do
-        (process msg q-in output-dir)
-        (recur (mq/get-one q-out))))))
+    (cond (not (nil? msg))
+	  (do
+	    (process msg q-in output-dir)
+	    (recur (mq/get-one q-out)))
+	  (not (mq/is-connection-open?))
+	  (init-connection connection-creds))))
