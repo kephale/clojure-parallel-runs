@@ -1,6 +1,7 @@
 (ns clojure-parallel-runs.rabbitmq
   (:use [rabbitcj.client]
-        [clojure.contrib.json]))
+	[clj-serializer.core]))
+;        [clojure.contrib.json]))
 
 (def chan nil)
 
@@ -25,11 +26,19 @@
     (declare-queue chan queue-name false false true nil)
     (bind-queue chan queue-name queue-name "")))
 
-(defn get-one 
+#_(defn get-one 
   "Get one message from the queue with the given name."
   [q] (try (read-json (String. (.. chan (basicGet q true) (getBody))) true)
-        (catch java.lang.Exception e (println e))))
+	   (catch java.lang.Exception e (println e))))
 
-(defn send-one
+(defn get-one
+  "Get one message from the queue with the given name."
+  [q]
+  (try (deserialize (.. chan (basicGet q true) (getBody)) (Object.))
+       (catch java.lang.Exception _ nil)))
+
+#_(defn send-one
   "Get one message from the queue with the given name."
   [q i] (publish chan q "" (json-str i)))
+
+(defn send-one [q i] (publish chan q "" (String. (serialize i))))
